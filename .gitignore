@@ -1,0 +1,14 @@
+node_modules/
+android/
+ios/
+.DS_Store
+*.log
+.env
+build-bundle.js
+build-vr.ps1
+debug-quest.ps1
+capacitor.config.json
+package.json
+package-lock.json
+www/test.html
+www/index.html

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>STACK VOID VR</title>
+
+    <!-- Import Map for Three.js and dependencies -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "./node_modules/three/build/three.module.js",
+        "three/addons/": "./node_modules/three/examples/jsm/"
+      }
+    }
+  </script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <!-- Simple error safety net - TEMPORARILY DISABLED TO SEE ERRORS -->
+    <script>
+        console.log('VR HTML loaded, DOM parsing...');
+        // window.addEventListener('unhandledrejection', (e) => e.preventDefault());
+        // window.onerror = () => true;
+    </script>
+</head>
+
+<body>
+    <!-- 3D Canvas Container -->
+    <div id="root"></div>
+
+    <!-- UI Overlay -->
+    <div id="ui-root"></div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div style="text-align:center;">
+            <h1
+                style="font-size: 2.5rem; font-weight: 900; letter-spacing: -1px; margin: 0; text-shadow: 0 0 20px var(--neon-cyan);">
+                STACK VOID VR
+            </h1>
+            <div
+                style="width: 200px; height: 4px; background: rgba(255,255,255,0.1); margin: 30px auto; border-radius: 2px; overflow: hidden;">
+                <div id="loading-progress"
+                    style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink)); transition: width 0.3s;">
+                </div>
+            </div>
+            <div id="loader-fill" style="width: 0%; transition: width 0.6s;"></div>
+            <p style="opacity: 0.5; font-size: 0.8rem;">Loading VR Experience...</p>
+            <p style="opacity: 0.3; font-size: 0.7rem; margin-top: 20px;">
+                🥽 Put on your Oculus headset and click "Enter VR" when ready
+            </p>
+        </div>
+    </div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="tutorial-overlay" style="display: none;">
+        <div class="glass-panel" style="max-width: 500px;">
+            <h2 style="font-weight: 900; font-size: 1.8rem; margin-bottom: 20px;">HOW TO PLAY (VR)</h2>
+            <div style="text-align: left; line-height: 1.6; opacity: 0.9; font-size: 0.95rem;">
+                <p><strong>🎯 Goal:</strong> Stack blocks as high as possible!</p>
+                <p><strong>🎮 VR Controls:</strong> Press either controller's <strong>trigger</strong> to drop the
+                    moving block.</p>
+                <p><strong>⚡ Perfect Placement:</strong> Land exactly on top to keep full size and build a combo streak.
+                </p>
+                <p><strong>✂️ Imperfect Placement:</strong> Overhang gets cut off, making the next block smaller.</p>
+                <p><strong>💎 Power-ups:</strong> Earn special abilities at combo milestones (5, 10, 15+):</p>
+                <ul style="margin: 10px 0; padding-left: 25px;">
+                    <li><strong>⏱️ Slow-Mo:</strong> Slows block movement by 50% for 10 seconds</li>
+                    <li><strong>🛡️ Safety Net:</strong> Saves you from one miss</li>
+                    <li><strong>📏 Super Size:</strong> Next 2 blocks are 30% larger</li>
+                </ul>
+                <p><strong>📍 Navigation:</strong> Point your controller at buttons and pull the trigger to select.</p>
+                <p><strong>❌ Game Over:</strong> Miss the platform completely (unless you have Safety Net!).</p>
+            </div>
+            <button class="btn btn-cta" onclick="window.closeTutorial()" style="margin-top: 20px; width: 100%;">
+                GOT IT!
+            </button>
+        </div>
+    </div>
+
+    <!-- Power-up Inventory (bottom of screen) -->
+    <div class="powerup-inventory">
+        <div class="powerup-slot" id="powerup-slot-0" onclick="window.activatePowerUpSlot(0)">
+            <div class="powerup-icon" id="powerup-icon-0"></div>
+        </div>
+        <div class="powerup-slot" id="powerup-slot-1" onclick="window.activatePowerUpSlot(1)">
+            <div class="powerup-icon" id="powerup-icon-1"></div>
+        </div>
+        <div class="powerup-slot" id="powerup-slot-2" onclick="window.activatePowerUpSlot(2)">
+            <div class="powerup-icon" id="powerup-icon-2"></div>
+        </div>
+    </div>
+
+    <!-- Main VR Application -->
+    <script type="module" src="js/main-vr.js"></script>
+</body>
+
+</html>
