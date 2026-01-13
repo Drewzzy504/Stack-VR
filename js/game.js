@@ -328,7 +328,13 @@ export function startGame(state, uiManager) {
   state.continuePending = false;
 
   cleanup(state);
-  audioService.init();
+
+  try {
+    audioService.init();
+  } catch (e) {
+    console.warn("Audio init failed:", e);
+  }
+
   const d = DIFFICULTIES[state.difficulty];
 
   state.status = 'PLAYING';
@@ -343,9 +349,13 @@ export function startGame(state, uiManager) {
   if (scene) {
     const originalBg = scene.background.clone();
     scene.background = new THREE.Color(0x00FF00); // FLASH GREEN
-    setTimeout(() => {
-      scene.background = originalBg;
-    }, 500);
+    setTimeout(() => { if (scene) scene.background = originalBg; }, 500);
+  }
+
+  // Safety check for theme
+  if (!state.currentTheme || !state.currentTheme.colors) {
+    console.warn("Theme missing, using fallback");
+    state.currentTheme = { id: 'default', colors: [0x00ffff, 0xff00ff, 0x0000ff, 0xffffff] };
   }
 
   // Reset power-ups for new game
@@ -362,15 +372,23 @@ export function startGame(state, uiManager) {
   state.camTarget.set(14, 8, 14);
   state.lookTarget.set(0, 0.5, 0);
 
-  // Set camera position immediately when starting game
-  camera.position.set(12, 4, 12);
-  camera.lookAt(0, 0.5, 0);
+  // REMOVED manual camera reset to avoid fighting VR rig
+  // camera.position.set(12, 4, 12);
+  // camera.lookAt(0, 0.5, 0);
 
   createFoundation(state);
   updateThemeVisuals(state);
 
   uiManager.render(state);
-  spawnNewBlock(state);
+
+  try {
+    spawnNewBlock(state);
+  } catch (e) {
+    console.error("Spawn Block Failed:", e);
+    if (typeof updateVRText === 'function' && window.scoreText) {
+      updateVRText("ERR: SPAWN", window.scoreText, "#ff0000");
+    }
+  }
 }
 
 /**

@@ -144,10 +144,14 @@ function animate(time, frame) {
     state.shakeOffset.set(0, 0, 0);
 
     // DEBUG: Animate Ball to prove loop is running
-    // RED = START/LOADING, GREEN = PLAYING
+    // RED = START, BLUE = LOADING, GREEN = PLAYING, ORANGE = GAMEOVER
     if (window.debugBall) {
         window.debugBall.position.y = 4 + Math.sin(time / 500) * 1.0;
-        const color = (state.status === 'PLAYING') ? 0x00FF00 : 0xFF0000;
+        let color = 0xFF0000; // Default Red (START)
+        if (state.status === 'PLAYING') color = 0x00FF00;
+        else if (state.status === 'LOADING') color = 0x0000FF; // BLUE
+        else if (state.status === 'GAMEOVER') color = 0xFFA500; // ORANGE
+
         window.debugBall.material.color.setHex(color);
     }
 
