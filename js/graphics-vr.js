@@ -305,8 +305,9 @@ function createControllerVisual(index) {
 /**
  * Initialize Three.js engine and scene with VR support
  * @param {object} state - Game state
+ * @param {Function} onInput - Input callback (controller index)
  */
-export function initEngine(state) {
+export function initEngine(state, onInput) {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000005);
     scene.fog = new THREE.FogExp2(0x000005, 0.008);
@@ -340,6 +341,11 @@ export function initEngine(state) {
         controller.userData.index = i;
         cameraGroup.add(controller);
         controllers.push(controller);
+
+        // Attach input listener IMMEDIATELY
+        if (onInput) {
+            controller.addEventListener('selectstart', () => onInput(i));
+        }
 
         const controllerGrip = renderer.xr.getControllerGrip(i);
         cameraGroup.add(controllerGrip);

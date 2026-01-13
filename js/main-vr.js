@@ -196,7 +196,7 @@ function animate(time, frame) {
         state.camTarget.set(0, h + 2, 5);
         if (cameraGroup) {
             cameraGroup.position.lerp(state.camTarget, CONFIG.CAMERA_LERP * 0.5);
-            cameraGroup.lookAt(0, h + 2, 0);
+            // lookAt removed to prevent fighting headset tracking
         }
 
         // DEBUG: Status Overlay
@@ -408,11 +408,11 @@ async function init() {
     if (progressEl) progressEl.style.width = '50%';
 
     // Initialize Three.js engine with VR support
-    initEngine(state);
+    initEngine(state, handleVRInput);
     if (progressEl) progressEl.style.width = '75%';
 
-    // Setup VR controllers
-    setupControllers();
+    // Setup VR controllers - DONE inside initEngine now
+    // setupControllers();
 
     // Load game data and show start screen
     await initGameData();
