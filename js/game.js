@@ -125,7 +125,14 @@ export function placeBlock(state, uiManager) {
   if (!state.activeBlock) return;
 
   // Grace Period: Don't allow placing block immediately after spawn
-  if (state.lastSpawnTime && performance.now() - state.lastSpawnTime < 2000) return;
+  if (state.lastSpawnTime && (performance.now() - state.lastSpawnTime < 2000)) {
+    // DEBUG: Show waiting
+    if (typeof window.updateVRText === 'function' && window.comboText) {
+      window.comboText.visible = true;
+      window.updateVRText(`WAIT: ${Math.round(performance.now() - state.lastSpawnTime)}`, window.comboText, '#00FF00');
+    }
+    return;
+  }
 
   const active = state.activeBlock;
   const prev = state.stack[state.stack.length - 1];
@@ -145,6 +152,10 @@ export function placeBlock(state, uiManager) {
 
   // Check for complete miss
   if (overlap <= 0.05) {
+    if (typeof window.updateVRText === 'function' && window.comboText) {
+      window.comboText.visible = true;
+      window.updateVRText(`DIE: ${overlap.toFixed(2)}`, window.comboText, '#FF0000');
+    }
     // Check for Safety Net power-up
     if (state.activePowerUps.safetyNet.active && state.activePowerUps.safetyNet.uses > 0) {
       // Use safety net instead of game over

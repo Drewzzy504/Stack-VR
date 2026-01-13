@@ -211,12 +211,16 @@ function animate(time, frame) {
             // lookAt removed to prevent fighting headset tracking
         }
 
-        // DEBUG: Status Overlay
         if (comboText && state.status !== 'PLAYING') {
             comboText.visible = true;
             updateVRText(`STATUS: ${state.status}`, comboText, '#ffff00');
         }
     }
+
+    // DEBUG: Expose for game.js
+    window.updateVRText = updateVRText;
+    window.comboText = comboText;
+    window.scoreText = scoreText;
 
     // Apply screen shake
     if (state.shakeTime > 0) {
