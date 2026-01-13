@@ -88,6 +88,13 @@ function setupControllers() {
  * Update VR UI displays
  */
 function updateVRUIDisplay() {
+    // Position UI to follow camera height (but reachable/readable)
+    if (uiGroup) {
+        const h = state.stack.length * CONFIG.BLOCK_HEIGHT;
+        // Position UI slightly above the current stack top
+        uiGroup.position.y = h + 4;
+    }
+
     // Check game status for main messages
     if (state.status === 'START') {
         if (scoreText) updateVRText('PULL TRIGGER TO START', scoreText, '#00ff00');
@@ -120,13 +127,6 @@ function updateVRUIDisplay() {
         } else {
             comboText.visible = false;
         }
-    }
-
-    // Position UI to follow camera height (but reachable/readable)
-    if (uiGroup && state.stack.length > 0) {
-        const h = state.stack.length * CONFIG.BLOCK_HEIGHT;
-        // Position UI slightly above the current stack top
-        uiGroup.position.y = h + 4;
     }
 }
 
