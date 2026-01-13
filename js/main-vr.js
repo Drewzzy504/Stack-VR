@@ -143,6 +143,14 @@ function animate(time, frame) {
     }
     state.shakeOffset.set(0, 0, 0);
 
+    // DEBUG: Animate Ball to prove loop is running
+    // RED = START/LOADING, GREEN = PLAYING
+    if (window.debugBall) {
+        window.debugBall.position.y = 4 + Math.sin(time / 500) * 1.0;
+        const color = (state.status === 'PLAYING') ? 0x00FF00 : 0xFF0000;
+        window.debugBall.material.color.setHex(color);
+    }
+
     if (!state.lastTime) state.lastTime = time;
     const dt = Math.min((time - state.lastTime) / 1000, 0.04);
     state.lastTime = time;
@@ -420,6 +428,23 @@ async function init() {
 
     // Initialize AdMob
     await adMobService.init();
+
+    // DEBUG: Auto-Start Game after 5 seconds
+    setTimeout(() => {
+        if (state.status !== 'PLAYING') {
+            startGame(state, uiManager);
+        }
+    }, 5000);
+
+    // DEBUG: Add Frame Loop Visualizer (Bouncing Ball)
+    const debugBallGeom = new THREE.SphereGeometry(0.5);
+    const debugBallMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+    const debugBall = new THREE.Mesh(debugBallGeom, debugBallMat);
+    debugBall.position.set(2, 4, 0); // To the right
+    if (scene) scene.add(debugBall);
+
+    // Attach to window for animate loop to access
+    window.debugBall = debugBall;
 
     // Setup event listeners
     window.addEventListener('resize', () => handleResize(state));
