@@ -270,8 +270,14 @@ function animate(time, frame) {
     // Update VR UI
     updateVRUIDisplay();
 
-    // Render (composer for post-processing effects)
-    composer.render();
+    // Render
+    if (renderer.xr.isPresenting) {
+        // Direct render for VR to ensure compatibility and performance
+        renderer.render(scene, camera);
+    } else {
+        // Use composer for post-processing in desktop preview
+        composer.render();
+    }
 }
 
 /**
