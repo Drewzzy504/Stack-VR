@@ -319,9 +319,9 @@ export function initEngine(state) {
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ antialias: false }); // Disable AA for testing
+    // renderer.setPixelRatio(window.devicePixelRatio); // Let WebXR handle pixel ratio
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.PIXEL_RATIO_CAP));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
 
