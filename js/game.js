@@ -125,7 +125,7 @@ export function placeBlock(state, uiManager) {
   if (!state.activeBlock) return;
 
   // Grace Period: Don't allow placing block immediately after spawn
-  if (state.lastSpawnTime && performance.now() - state.lastSpawnTime < 500) return;
+  if (state.lastSpawnTime && performance.now() - state.lastSpawnTime < 2000) return;
 
   const active = state.activeBlock;
   const prev = state.stack[state.stack.length - 1];
