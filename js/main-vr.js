@@ -213,7 +213,7 @@ function animate(time, frame) {
 
         if (comboText && state.status !== 'PLAYING') {
             comboText.visible = true;
-            updateVRText(`STATUS: ${state.status}`, comboText, '#ffff00');
+            // updateVRText(`STATUS: ${state.status}`, comboText, '#ffff00'); // DISABLED to allow DIE/WAIT text
         }
     }
 
