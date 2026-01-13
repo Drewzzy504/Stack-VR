@@ -8,22 +8,22 @@ import { persistBestScores } from './storage.js';
 import { reconcileThemeUnlock } from './utils.js';
 import { audioService } from './audio.js';
 import { adMobService } from './admob.js';
-import { 
-  updatePowerUpUI, 
-  awardPowerUp, 
-  getSpeedMultiplier 
+import {
+  updatePowerUpUI,
+  awardPowerUp,
+  getSpeedMultiplier
 } from './powerups.js';
-import { 
-  triggerPerfectFeedback, 
-  triggerCrashFeedback 
+import {
+  triggerPerfectFeedback,
+  triggerCrashFeedback
 } from './effects.js';
-import { 
-  scene, 
+import {
+  scene,
   camera,
   rubbleInstances,
   createGlassMaterial,
   createFoundation,
-  updateThemeVisuals 
+  updateThemeVisuals
 } from './graphics.js';
 
 // Temporary matrix for rubble transforms
@@ -37,11 +37,11 @@ export function spawnNewBlock(state) {
   const prev = state.stack[state.stack.length - 1];
   state.axis = state.axis === 'x' ? 'z' : 'x';
   const color = new THREE.Color(state.currentTheme.colors[state.stack.length % state.currentTheme.colors.length]);
-  
+
   // Get base size from previous block
   const baseWidth = prev.userData?.baseWidth || prev.geometry.parameters.width;
   const baseDepth = prev.userData?.baseDepth || prev.geometry.parameters.depth;
-  
+
   // Apply Super Size power-up if active
   let actualWidth = baseWidth;
   let actualDepth = baseDepth;
@@ -49,20 +49,20 @@ export function spawnNewBlock(state) {
     actualWidth = baseWidth * 1.3;
     actualDepth = baseDepth * 1.3;
   }
-  
+
   const geom = new THREE.BoxGeometry(
     actualWidth,
     CONFIG.BLOCK_HEIGHT,
     actualDepth
   );
   const mesh = new THREE.Mesh(geom, createGlassMaterial(color));
-  
+
   // Store base size for next block
   mesh.userData = {
     baseWidth: baseWidth,
     baseDepth: baseDepth
   };
-  
+
   mesh.position.y = state.stack.length * CONFIG.BLOCK_HEIGHT + CONFIG.BLOCK_HEIGHT / 2;
   const offset = Math.random() > 0.5 ? 12 : -12;
   state.direction = offset > 0 ? -1 : 1;
@@ -105,8 +105,8 @@ export function spawnRubble(state, active, prev, axis, delta, overlap) {
   state.rubbleData[idx].rotation.set(0, 0, 0);
   state.rubbleData[idx].velocity.set(0, -10, 0);
   state.rubbleData[idx].angularVelocity.set(
-    Math.random() * 8 - 4, 
-    Math.random() * 4 - 2, 
+    Math.random() * 8 - 4,
+    Math.random() * 4 - 2,
     Math.random() * 8 - 4
   );
 
@@ -123,7 +123,7 @@ export function spawnRubble(state, active, prev, axis, delta, overlap) {
  */
 export function placeBlock(state, uiManager) {
   if (!state.activeBlock) return;
-  
+
   const active = state.activeBlock;
   const prev = state.stack[state.stack.length - 1];
   const diffConfig = DIFFICULTIES[state.difficulty];
@@ -139,7 +139,7 @@ export function placeBlock(state, uiManager) {
 
   const absDelta = Math.abs(delta);
   const overlap = size - absDelta;
-  
+
   // Check for complete miss
   if (overlap <= 0.05) {
     // Check for Safety Net power-up
@@ -151,11 +151,11 @@ export function placeBlock(state, uiManager) {
       }
       state.combo = 0; // Break combo but don't end game
       updatePowerUpUI(state);
-      
+
       // Visual feedback
       audioService.playTone(523, state.isMuted);
       state.flash = 0.3;
-      
+
       // Clean up the block
       if (state.activeBlock) {
         scene.remove(state.activeBlock);
@@ -163,12 +163,12 @@ export function placeBlock(state, uiManager) {
         state.activeBlock.material.dispose();
         state.activeBlock = null;
       }
-      
+
       // Spawn new block on top of previous one
       spawnNewBlock(state);
       return;
     }
-    
+
     gameOver(state, uiManager);
     return;
   }
@@ -181,7 +181,7 @@ export function placeBlock(state, uiManager) {
       state.maxSessionCombo = state.combo;
     }
     state.flash = 0.5;
-    
+
     triggerPerfectFeedback(state);
     audioService.playNote(state.stack.length, true, state.isMuted);
 
@@ -210,13 +210,13 @@ export function placeBlock(state, uiManager) {
       ? new THREE.BoxGeometry(overlap, CONFIG.BLOCK_HEIGHT, other)
       : new THREE.BoxGeometry(other, CONFIG.BLOCK_HEIGHT, overlap);
     active.position[axis] = prev.position[axis] + delta / 2;
-    
+
     // Update base size after trimming - store the ACTUAL trimmed size as new base
     // (Don't apply Super Size multiplier to the stored base - that happens at spawn time)
     if (!active.userData) active.userData = {};
     active.userData.baseWidth = axis === 'x' ? overlap : other;
     active.userData.baseDepth = axis === 'x' ? other : overlap;
-    
+
     // Decrement Super Size counter on imperfect placement too
     if (state.activePowerUps.superSize.active && state.activePowerUps.superSize.count > 0) {
       state.activePowerUps.superSize.count--;
@@ -225,7 +225,7 @@ export function placeBlock(state, uiManager) {
       }
       updatePowerUpUI(state);
     }
-    
+
     audioService.playNote(state.stack.length, false, state.isMuted);
   }
 
@@ -245,22 +245,22 @@ export function placeBlock(state, uiManager) {
 export function continueGame(state, uiManager) {
   // Mark continue as used
   state.continuesUsed++;
-  
+
   // Resume playing
   state.status = 'PLAYING';
-  
+
   // Give grace rewards to make player feel good!
   // 1. Add Safety Net (saves from next crash)
   state.activePowerUps.safetyNet.active = true;
   state.activePowerUps.safetyNet.uses = 1;
-  
+
   // 2. Activate Slow-Mo for 5 seconds (breathing room)
   state.activePowerUps.slowMo.active = true;
   state.activePowerUps.slowMo.duration = 5.0;
-  
+
   // Update UI to show the grace rewards
   updatePowerUpUI(state);
-  
+
   // Show notification about the rewards
   const notification = document.createElement('div');
   notification.className = 'powerup-notification';
@@ -283,12 +283,12 @@ export function continueGame(state, uiManager) {
     box-shadow: 0 0 30px rgba(0, 255, 170, 0.5);
   `;
   document.body.appendChild(notification);
-  
+
   setTimeout(() => {
     notification.style.animation = 'slideUp 0.5s ease-in';
     setTimeout(() => notification.remove(), 500);
   }, 2500);
-  
+
   // Refresh UI
   uiManager.render(state);
 }
@@ -309,12 +309,12 @@ export function gameOver(state, uiManager) {
   audioService.playGameOver(state.isMuted);
   persistBestScores(state.bestScore, state.bestStreak);
   reconcileThemeUnlock(state);
-  
+
   // Show interstitial ad every 3 games
   if (adMobService.shouldShowInterstitial()) {
     adMobService.showInterstitial();
   }
-  
+
   uiManager.render(state);
 }
 
@@ -338,6 +338,15 @@ export function startGame(state, uiManager) {
   state.maxSessionCombo = 0;
   state.speed = d.initial;
   state.axis = 'x';
+
+  // DEBUG: Visual confirmation that game has started
+  if (scene) {
+    const originalBg = scene.background.clone();
+    scene.background = new THREE.Color(0x00FF00); // FLASH GREEN
+    setTimeout(() => {
+      scene.background = originalBg;
+    }, 500);
+  }
 
   // Reset power-ups for new game
   state.powerUps = [null, null, null];
@@ -376,7 +385,7 @@ export function backToMenu(state, uiManager) {
     state.stack = [];
     state.activeBlock = null;
   }
-  
+
   state.status = 'START';
   updateThemeVisuals(state);
   uiManager.render(state);
@@ -390,7 +399,7 @@ export function backToMenu(state, uiManager) {
 export function resumeGame(state, uiManager) {
   // Don't allow resume if game is over
   if (state.status === 'GAMEOVER') return;
-  
+
   state.status = 'PLAYING';
   state.lastTime = performance.now();
   uiManager.render(state);

@@ -209,25 +209,25 @@ function createVRUI() {
     uiGroup = new THREE.Group();
 
     // Position UI in front of and above the player's typical viewing area
-    uiGroup.position.set(0, 12, -2);
+    uiGroup.position.set(0, 12, -2); // Y will be overridden by main-vr.js
 
     // Create score display using sprites for simplicity
     const createTextSprite = (text, color = '#00ffff') => {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.width = 512;
-        canvas.height = 128;
+        canvas.width = 1024; // Double width
+        canvas.height = 256; // Double height
 
         context.fillStyle = color;
-        context.font = 'bold 72px Arial';
+        context.font = 'bold 120px Arial'; // Larger font
         context.textAlign = 'center';
         context.textBaseline = 'middle';
-        context.fillText(text, 256, 64);
+        context.fillText(text, 512, 128); // Center in new dimensions
 
         const texture = new THREE.CanvasTexture(canvas);
         const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(material);
-        sprite.scale.set(4, 1, 1);
+        sprite.scale.set(6, 1.5, 1); // Larger scale
 
         sprite.userData.canvas = canvas;
         sprite.userData.context = context;
@@ -238,11 +238,11 @@ function createVRUI() {
     };
 
     scoreText = createTextSprite('SCORE: 0', '#00ffff');
-    scoreText.position.set(0, 0.5, 0);
+    scoreText.position.set(0, 0.8, 0); // Spaced out
     uiGroup.add(scoreText);
 
     comboText = createTextSprite('', '#ff0070');
-    comboText.position.set(0, -0.5, 0);
+    comboText.position.set(0, -0.8, 0);
     comboText.visible = false;
     uiGroup.add(comboText);
 
@@ -267,10 +267,10 @@ export function updateVRText(text, sprite, color) {
 
     // Draw new text
     context.fillStyle = color || sprite.userData.color;
-    context.font = 'bold 72px Arial';
+    context.font = 'bold 120px Arial';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.fillText(text, 256, 64);
+    context.fillText(text, 512, 128);
 
     // Update texture
     texture.needsUpdate = true;

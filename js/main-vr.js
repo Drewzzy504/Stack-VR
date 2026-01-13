@@ -192,8 +192,8 @@ function animate(time, frame) {
         // VR mode - move the camera RIG (dolly), not the camera itself
         const h = state.stack.length * CONFIG.BLOCK_HEIGHT;
         // Position rig so user (at 0,0,0 local) is viewing the stack comfortably
-        // We offset Y by -1.0 to account for typical standing height, aligning eye level with action
-        state.camTarget.set(0, h + 2, -6); // Flip to Z = -6 to see if that fixes orientation
+        // Z = +5 means user is 5 meters away, looking at Z=0 (Standard WebXR orientation)
+        state.camTarget.set(0, h + 2, 5);
         if (cameraGroup) {
             cameraGroup.position.lerp(state.camTarget, CONFIG.CAMERA_LERP * 0.5);
             cameraGroup.lookAt(0, h + 2, 0);
