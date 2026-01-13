@@ -307,21 +307,14 @@ function createControllerVisual(index) {
  */
 export function initEngine(state) {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0000FF); // Blue background for debugging
-    // scene.fog = new THREE.FogExp2(0x000005, 0.008);
-
-    // Add debugging cube
-    const debugGeo = new THREE.BoxGeometry(1, 1, 1);
-    const debugMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
-    const debugMesh = new THREE.Mesh(debugGeo, debugMat);
-    debugMesh.position.set(0, 1.5, -2); // Directly in front of camera
-    scene.add(debugMesh);
+    scene.background = new THREE.Color(0x000005);
+    scene.fog = new THREE.FogExp2(0x000005, 0.008);
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-    renderer = new THREE.WebGLRenderer({ antialias: false }); // Disable AA for testing
-    // renderer.setPixelRatio(window.devicePixelRatio); // Let WebXR handle pixel ratio
+    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.PIXEL_RATIO_CAP));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
 
