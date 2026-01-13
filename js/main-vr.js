@@ -54,8 +54,8 @@ let controllerInputCooldown = [0, 0];
  * @param {number} controllerIndex - Index of controller (0 or 1)
  */
 function handleVRInput(controllerIndex) {
-    // Start game if in menu or game over state
-    if (state.status === 'START' || state.status === 'GAMEOVER') {
+    // Start game if in menu, game over, or stuck in loading state
+    if (state.status === 'START' || state.status === 'GAMEOVER' || state.status === 'LOADING') {
         const now = performance.now();
         if (now - controllerInputCooldown[controllerIndex] < CONFIG.INPUT_COOLDOWN) return;
         controllerInputCooldown[controllerIndex] = now;
@@ -193,11 +193,16 @@ function animate(time, frame) {
         const h = state.stack.length * CONFIG.BLOCK_HEIGHT;
         // Position rig so user (at 0,0,0 local) is viewing the stack comfortably
         // We offset Y by -1.0 to account for typical standing height, aligning eye level with action
-        state.camTarget.set(0, h + 2, 6);
+        state.camTarget.set(0, h + 2, -6); // Flip to Z = -6 to see if that fixes orientation
         if (cameraGroup) {
             cameraGroup.position.lerp(state.camTarget, CONFIG.CAMERA_LERP * 0.5);
-            // Ensure camera rig looks at the tower
             cameraGroup.lookAt(0, h + 2, 0);
+        }
+
+        // DEBUG: Status Overlay
+        if (comboText && state.status !== 'PLAYING') {
+            comboText.visible = true;
+            updateVRText(`STATUS: ${state.status}`, comboText, '#ffff00');
         }
     }
 
