@@ -54,6 +54,15 @@ let controllerInputCooldown = [0, 0];
  * @param {number} controllerIndex - Index of controller (0 or 1)
  */
 function handleVRInput(controllerIndex) {
+    // Start game if in menu or game over state
+    if (state.status === 'START' || state.status === 'GAMEOVER') {
+        const now = performance.now();
+        if (now - controllerInputCooldown[controllerIndex] < CONFIG.INPUT_COOLDOWN) return;
+        controllerInputCooldown[controllerIndex] = now;
+        startGame(state, uiManager);
+        return;
+    }
+
     if (state.status !== 'PLAYING') return;
 
     const now = performance.now();
@@ -79,7 +88,26 @@ function setupControllers() {
  * Update VR UI displays
  */
 function updateVRUIDisplay() {
-    // Update score text
+    // Check game status for main messages
+    if (state.status === 'START') {
+        if (scoreText) updateVRText('PULL TRIGGER TO START', scoreText, '#00ff00');
+        if (comboText) {
+            comboText.visible = true;
+            updateVRText('STACK VOID VR', comboText, '#00ffff');
+        }
+        return;
+    }
+
+    if (state.status === 'GAMEOVER') {
+        if (scoreText) updateVRText('GAME OVER', scoreText, '#ff0000');
+        if (comboText) {
+            comboText.visible = true;
+            updateVRText('PULL TRIGGER TO RETRY', comboText, '#ffff00');
+        }
+        return;
+    }
+
+    // Update score text during gameplay
     if (scoreText) {
         updateVRText(`SCORE: ${state.score}`, scoreText, '#00ffff');
     }
