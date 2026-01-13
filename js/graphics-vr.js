@@ -13,6 +13,7 @@ import { CONFIG } from './config.js';
 // Three.js globals (will be initialized by initEngine)
 export let scene = null;
 export let camera = null;
+export let cameraGroup = null;
 export let renderer = null;
 export let composer = null;
 export let bloomPass = null;
@@ -310,7 +311,12 @@ export function initEngine(state) {
     scene.background = new THREE.Color(0x000005);
     scene.fog = new THREE.FogExp2(0x000005, 0.008);
 
+    // Create camera group (Dolly) for VR movement
+    cameraGroup = new THREE.Group();
+    scene.add(cameraGroup);
+
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    cameraGroup.add(camera);
 
     renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -332,11 +338,11 @@ export function initEngine(state) {
     for (let i = 0; i < 2; i++) {
         const controller = renderer.xr.getController(i);
         controller.userData.index = i;
-        scene.add(controller);
+        cameraGroup.add(controller);
         controllers.push(controller);
 
         const controllerGrip = renderer.xr.getControllerGrip(i);
-        scene.add(controllerGrip);
+        cameraGroup.add(controllerGrip);
         controllerGrips.push(controllerGrip);
 
         // Add visual line for pointing

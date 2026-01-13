@@ -17,6 +17,7 @@ import {
     adaptQuality,
     scene,
     camera,
+    cameraGroup,
     renderer,
     composer,
     nebula,
@@ -93,10 +94,11 @@ function updateVRUIDisplay() {
         }
     }
 
-    // Position UI to follow camera height
+    // Position UI to follow camera height (but reachable/readable)
     if (uiGroup && state.stack.length > 0) {
         const h = state.stack.length * CONFIG.BLOCK_HEIGHT;
-        uiGroup.position.y = h + 8;
+        // Position UI slightly above the current stack top
+        uiGroup.position.y = h + 4;
     }
 }
 
@@ -107,8 +109,9 @@ function updateVRUIDisplay() {
  */
 function animate(time, frame) {
     // Remove last frame's shake offset
-    if (camera && state.shakeOffset) {
-        camera.position.sub(state.shakeOffset);
+    const shakeTarget = (cameraGroup && renderer.xr.isPresenting) ? cameraGroup : camera;
+    if (shakeTarget && state.shakeOffset) {
+        shakeTarget.position.sub(state.shakeOffset);
     }
     state.shakeOffset.set(0, 0, 0);
 
@@ -158,10 +161,16 @@ function animate(time, frame) {
             camera.lookAt(state.lookTarget.x, Math.max(0, state.lookTarget.y - 2.8), state.lookTarget.z);
         }
     } else {
-        // VR mode - camera follows stack height vertically only
+        // VR mode - move the camera RIG (dolly), not the camera itself
         const h = state.stack.length * CONFIG.BLOCK_HEIGHT;
-        state.camTarget.set(0, h + 4, 8);
-        camera.position.lerp(state.camTarget, CONFIG.CAMERA_LERP * 0.5);
+        // Position rig so user (at 0,0,0 local) is viewing the stack comfortably
+        // We offset Y by -1.0 to account for typical standing height, aligning eye level with action
+        state.camTarget.set(0, h + 2, 6);
+        if (cameraGroup) {
+            cameraGroup.position.lerp(state.camTarget, CONFIG.CAMERA_LERP * 0.5);
+            // Ensure camera rig looks at the tower
+            cameraGroup.lookAt(0, h + 2, 0);
+        }
     }
 
     // Apply screen shake
@@ -175,7 +184,7 @@ function animate(time, frame) {
             (Math.random() - 0.5) * amp * 0.6,
             (Math.random() - 0.5) * amp
         );
-        camera.position.add(state.shakeOffset);
+        if (shakeTarget) shakeTarget.position.add(state.shakeOffset);
 
         if (state.shakeTime === 0) {
             state.shakeAmp = 0;
